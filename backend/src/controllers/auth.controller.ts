@@ -1,12 +1,18 @@
 import type { Request, Response } from 'express';
 import * as authService from '../services/auth.service';
 import { getAuthUser } from '../utils/request';
-import { loginSchema } from '../validators/auth.validator';
+import { loginSchema, registerSchema } from '../validators/auth.validator';
 
 export async function login(req: Request, res: Response): Promise<void> {
   const { email, senha } = loginSchema.parse(req.body);
   const resultado = await authService.login(email, senha);
   res.json(resultado);
+}
+
+export async function register(req: Request, res: Response): Promise<void> {
+  const dados = registerSchema.parse(req.body);
+  const resultado = await authService.register(dados);
+  res.status(201).json(resultado);
 }
 
 export async function me(req: Request, res: Response): Promise<void> {

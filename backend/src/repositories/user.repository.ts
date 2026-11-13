@@ -1,4 +1,4 @@
-import type { RowDataPacket } from 'mysql2/promise';
+import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { pool } from '../config/database';
 import type { PublicUser, UserRow } from '../types';
 
@@ -16,4 +16,12 @@ export async function findPublicById(id: number): Promise<PublicUser | null> {
     [id],
   );
   return (rows[0] as PublicUser | undefined) ?? null;
+}
+
+export async function createRequester(nome: string, email: string, senhaHash: string): Promise<number> {
+  const [result] = await pool.execute<ResultSetHeader>(
+    "INSERT INTO usuarios (nome, email, senha_hash, perfil) VALUES (?, ?, ?, 'SOLICITANTE')",
+    [nome, email, senhaHash],
+  );
+  return result.insertId;
 }

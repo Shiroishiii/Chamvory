@@ -15,8 +15,11 @@ import TechnicianDashboard from '../pages/technician/Dashboard'
 import TicketAttendance from '../pages/technician/TicketAttendance'
 import TicketQueue from '../pages/technician/TicketQueue'
 import NotFound from '../pages/NotFound'
+import PrivateRoute from './PrivateRoute'
+import { useAuth } from '../hooks/useAuth'
 
 function AppRoutes() {
+    const { user } = useAuth()
     return (
         <Routes>
             <Route element={<AuthLayout />}>
@@ -24,20 +27,25 @@ function AppRoutes() {
                 <Route path="/register" element={<Register />} />
             </Route>
 
+            <Route element={<PrivateRoute />}>
             <Route element={<DashboardLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/dashboard" element={user?.perfil === 'TECNICO' ? <Navigate to="/tecnico/dashboard" replace /> : <Dashboard />} />
                 <Route path="/chamados" element={<MyTickets />} />
                 <Route path="/chamados/novo" element={<CreateTicket />} />
                 <Route path="/chamados/:id" element={<TicketDetails />} />
+                <Route path="/perfil" element={<Profile />} />
+            </Route>
+            </Route>
 
+            <Route element={<PrivateRoute role="TECNICO" />}>
+            <Route element={<DashboardLayout />}>
                 <Route path="/tecnico/dashboard" element={<TechnicianDashboard />} />
                 <Route path="/tecnico/fila" element={<TicketQueue />} />
                 <Route path="/tecnico/atendimento/:id" element={<TicketAttendance />} />
-
-                <Route path="/perfil" element={<Profile />} />
+            </Route>
             </Route>
 
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Navigate to={user ? (user.perfil === 'TECNICO' ? '/tecnico/dashboard' : '/dashboard') : '/login'} replace />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     )

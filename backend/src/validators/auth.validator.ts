@@ -13,3 +13,10 @@ export const loginSchema = z.object({
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
+
+export const registerSchema = z.object({
+  nome: z.string().trim().min(2).max(120),
+  email: z.string().trim().toLowerCase().email().max(160),
+  senha: z.string().min(8).max(72),
+});
+export type RegisterInput = z.infer<typeof registerSchema>;

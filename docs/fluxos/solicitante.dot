@@ -1,0 +1,2 @@
+digraph G { rankdir=TB; graph [bgcolor="white",pad="0.25",nodesep="0.35",ranksep="0.45"]; node [shape=box,style="rounded,filled",fillcolor="#F7F7FA",color="#7C3AED",fontname="Arial",fontsize=10]; edge [color="#6B7280",fontname="Arial",fontsize=9]; A[label="Login do solicitante"]; B[label="Dashboard"]; C[label="Novo chamado"]; D[label="Preencher assunto, descrição, categoria e prioridade"]; E[label="Validar dados"]; F[label="Criar chamado
+Número + data + status Aberto"]; G[label="Consultar próprios chamados"]; H[label="Detalhes e histórico"]; A->B->C->D->E->F->G->H; }

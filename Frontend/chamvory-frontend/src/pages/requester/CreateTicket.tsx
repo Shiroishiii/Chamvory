@@ -1,8 +1,9 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Send } from 'lucide-react'
 import PageTitle from '../../components/shared/PageTitle'
+import { api, errorMessage } from '../../services/api'
 
 function CreateTicket() {
     const navigate = useNavigate()
@@ -10,9 +11,11 @@ function CreateTicket() {
     const [subject, setSubject] = useState('')
     const [description, setDescription] = useState('')
     const [category, setCategory] = useState('')
-    const [priority, setPriority] = useState('Média')
+    const [priority, setPriority] = useState('MEDIA')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const [categories, setCategories] = useState<{ id: number; nome: string }[]>([])
+    useEffect(() => { api.get<{ categorias: { id: number; nome: string }[] }>('/categories').then(r => setCategories(r.data.categorias)).catch(e => setError(errorMessage(e))) }, [])
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -36,14 +39,13 @@ function CreateTicket() {
         setLoading(true)
 
         try {
-            // TODO: substituir pela requisição POST da API.
-            await new Promise((resolve) => setTimeout(resolve, 800))
+            await api.post('/tickets', { assunto: subject.trim(), descricao: description.trim(), categoria_id: Number(category), prioridade: priority })
 
             navigate('/chamados', {
                 state: { success: 'Chamado criado com sucesso!' },
             })
-        } catch {
-            setError('Não foi possível criar o chamado. Tente novamente.')
+        } catch (err) {
+            setError(errorMessage(err, 'Não foi possível criar o chamado. Tente novamente.'))
         } finally {
             setLoading(false)
         }
@@ -106,12 +108,7 @@ function CreateTicket() {
                                 className="h-11 w-full rounded-lg border border-[#E5E4EB] bg-white px-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
                             >
                                 <option value="">Selecione uma categoria</option>
-                                <option value="Hardware">Hardware</option>
-                                <option value="Software">Software</option>
-                                <option value="Rede">Rede e internet</option>
-                                <option value="Acesso">Acesso e login</option>
-                                <option value="Impressora">Impressoras</option>
-                                <option value="Outros">Outros</option>
+                                {categories.map((item) => <option key={item.id} value={item.id}>{item.nome}</option>)}
                             </select>
                         </div>
 
@@ -129,9 +126,9 @@ function CreateTicket() {
                                 onChange={(e) => setPriority(e.target.value)}
                                 className="h-11 w-full rounded-lg border border-[#E5E4EB] bg-white px-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
                             >
-                                <option value="Baixa">Baixa</option>
-                                <option value="Média">Média</option>
-                                <option value="Alta">Alta</option>
+                                <option value="BAIXA">Baixa</option>
+                                <option value="MEDIA">Média</option>
+                                <option value="ALTA">Alta</option>
                             </select>
 
                             <p className="text-xs text-[#9CA3AF]">

@@ -104,7 +104,7 @@ export async function updateFields(conn: PoolConnection, id: number, campos: Cam
   if (colunas.length === 0) return;
 
   const set = colunas.map((coluna) => `${coluna} = ?`).join(', ');
-  const valores = colunas.map((coluna) => campos[coluna]);
+  const valores = colunas.map((coluna) => campos[coluna]).filter((valor): valor is string | number => valor !== undefined);
   await conn.execute(`UPDATE chamados SET ${set} WHERE id = ?`, [...valores, id]);
 }
 

@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Eye, EyeOff, Headset, ArrowRight } from 'lucide-react'
+import { api, errorMessage } from '../../services/api'
 
 function Register() {
     const [name, setName] = useState('')
@@ -40,9 +41,12 @@ function Register() {
         setLoading(true)
 
         try {
-            // Integração com a API será adicionada posteriormente.
-            await new Promise((resolve) => setTimeout(resolve, 800))
-            setError('Cadastro ainda não conectado ao servidor.')
+            const { data } = await api.post('/auth/register', { nome: name.trim(), email: email.trim(), senha: password })
+            localStorage.setItem('chamvory_token', data.token)
+            localStorage.setItem('chamvory_user', JSON.stringify(data.usuario))
+            window.location.assign('/dashboard')
+        } catch (err) {
+            setError(errorMessage(err, 'Não foi possível criar sua conta.'))
         } finally {
             setLoading(false)
         }

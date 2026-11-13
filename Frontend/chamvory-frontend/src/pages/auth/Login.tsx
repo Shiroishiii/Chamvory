@@ -2,9 +2,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Headset, ArrowRight } from 'lucide-react'
+import { useAuth } from '../../hooks/useAuth'
+import { errorMessage } from '../../services/api'
 
 function Login() {
     const navigate = useNavigate()
+    const { login } = useAuth()
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -29,10 +32,11 @@ function Login() {
         setLoading(true)
 
         try {
-            // Integração com a API será adicionada posteriormente.
-            await new Promise((resolve) => setTimeout(resolve, 800))
-
-            setError('Autenticação ainda não configurada.')
+            await login(email.trim(), password)
+            const user = JSON.parse(localStorage.getItem('chamvory_user') || 'null')
+            navigate(user?.perfil === 'TECNICO' ? '/tecnico/dashboard' : '/dashboard', { replace: true })
+        } catch (err) {
+            setError(errorMessage(err, 'Não foi possível entrar. Verifique suas credenciais.'))
         } finally {
             setLoading(false)
         }
